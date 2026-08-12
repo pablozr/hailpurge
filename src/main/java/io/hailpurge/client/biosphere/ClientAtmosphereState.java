@@ -6,7 +6,7 @@ public final class ClientAtmosphereState {
     public static void tick() {
         if (ClientBiosphereState.current() == null) return;
         float target = Math.max(0.0F, (ClientBiosphereState.current().exposure() - 35) / 65.0F);
-        contamination += (target - contamination) * 0.12F;
+        contamination += (target - contamination) * 0.015F;
     }
 
     public static float contamination() { return contamination; }

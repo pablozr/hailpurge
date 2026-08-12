@@ -20,6 +20,7 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3f;
@@ -84,13 +85,15 @@ public final class BiosphereVisualEvents {
 
     @SubscribeEvent
     public static void onOverlay(RenderGuiOverlayEvent.Post event) {
+        if (event.getOverlay() != VanillaGuiOverlay.HOTBAR.type()) return;
         float contamination = ClientAtmosphereState.contamination();
         if (contamination <= 0.02F) return;
         int width = event.getWindow().getGuiScaledWidth();
         int height = event.getWindow().getGuiScaledHeight();
+        float pulse = 0.94F + (float) Math.sin(Minecraft.getInstance().level.getGameTime() * 0.04D) * 0.06F;
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        event.getGuiGraphics().setColor(0.76F, 0.63F, 0.16F, contamination * 0.42F);
+        event.getGuiGraphics().setColor(0.76F, 0.63F, 0.16F, contamination * 0.42F * pulse);
         event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, 0, 0, 0, 0, width, height, 256, 256);
         event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.disableBlend();
