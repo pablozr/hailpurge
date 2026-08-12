@@ -234,6 +234,7 @@ public final class BiosphereVisualEvents {
         renderGrid(poseStack, field, time);
         renderAnchorFields(poseStack, field, camera.x, camera.y, camera.z, renderDistance, time);
         renderAnchorSignals(poseStack, field, time);
+        renderCentralSignal(poseStack, field, time);
         RenderSystem.depthMask(true);
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
@@ -371,6 +372,22 @@ public final class BiosphereVisualEvents {
             buffer.vertex(poseStack.last().pose(), (float) (x + 0.06D), (float) (y + height), (float) z).color(color[0], color[1], color[2], 0.02F).endVertex();
             buffer.vertex(poseStack.last().pose(), (float) (x - 0.06D), (float) (y + height), (float) z).color(color[0], color[1], color[2], 0.02F).endVertex();
         }
+        BufferUploader.drawWithShader(buffer.end());
+    }
+
+    private static void renderCentralSignal(PoseStack poseStack, SyncBiospherePayload field, double time) {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        double x = field.centerX();
+        double y = field.centerY() - field.radius() / 2.0D + 1.0D;
+        double z = field.centerZ();
+        double height = 36.0D + Math.sin(time * 1.4D) * 4.0D;
+        float alpha = 0.56F + (float) Math.sin(time * 1.4D) * 0.12F;
+        buffer.vertex(poseStack.last().pose(), (float) (x - 0.34D), (float) y, (float) z).color(0.20F, 1.0F, 0.94F, alpha).endVertex();
+        buffer.vertex(poseStack.last().pose(), (float) (x + 0.34D), (float) y, (float) z).color(0.20F, 1.0F, 0.94F, alpha).endVertex();
+        buffer.vertex(poseStack.last().pose(), (float) (x + 0.05D), (float) (y + height), (float) z).color(0.20F, 1.0F, 0.94F, 0.02F).endVertex();
+        buffer.vertex(poseStack.last().pose(), (float) (x - 0.05D), (float) (y + height), (float) z).color(0.20F, 1.0F, 0.94F, 0.02F).endVertex();
         BufferUploader.drawWithShader(buffer.end());
     }
 
