@@ -45,8 +45,8 @@ public final class BiosphereAnchorMenu extends AbstractContainerMenu {
         return new BiosphereAnchorMenu(containerId, new SimpleContainerData(8), buffer.readBoolean());
     }
 
-    public int energy() { return data.get(0) | data.get(1) << 16; }
-    public int capacity() { return data.get(2) | data.get(3) << 16; }
+    public int energy() { return (data.get(0) & 0xFFFF) | (data.get(1) & 0xFFFF) << 16; }
+    public int capacity() { return (data.get(2) & 0xFFFF) | (data.get(3) & 0xFFFF) << 16; }
     public int radius() { return data.get(4); }
     public int condition() { return data.get(5); }
     public SectorStatus status() { return SectorStatus.values()[data.get(6)]; }
