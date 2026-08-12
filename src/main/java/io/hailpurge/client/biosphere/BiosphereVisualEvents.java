@@ -89,15 +89,15 @@ public final class BiosphereVisualEvents {
         int width = event.getWindow().getGuiScaledWidth();
         int height = event.getWindow().getGuiScaledHeight();
         double time = Minecraft.getInstance().level == null ? 0.0D : Minecraft.getInstance().level.getGameTime() * 0.025D;
-        float pulse = 0.86F + (float) Math.sin(time * 0.42D) * 0.08F;
-        float driftX = (float) Math.sin(time * 0.16D) * width * 0.06F;
-        float driftY = (float) Math.cos(time * 0.12D) * height * 0.04F;
-        event.getGuiGraphics().setColor(0.63F, 0.51F, 0.12F, contamination * 0.26F * pulse);
-        event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, (int) (-width * 0.18F + driftX), (int) (-height * 0.20F + driftY),
-                0, 0, (int) (width * 1.36F), (int) (height * 1.40F), 128, 128);
-        event.getGuiGraphics().setColor(0.42F, 0.36F, 0.08F, contamination * 0.18F);
-        event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, (int) (-width * 0.10F - driftX), (int) (-height * 0.12F - driftY),
-                0, 0, (int) (width * 1.24F), (int) (height * 1.28F), 128, 128);
+        float pulse = 0.92F + (float) Math.sin(time * 0.16D) * 0.035F;
+        float advance = contamination * contamination;
+        int insetX = (int) (width * 0.16F * (1.0F - advance));
+        int insetY = (int) (height * 0.16F * (1.0F - advance));
+        event.getGuiGraphics().setColor(0.76F, 0.63F, 0.16F, contamination * 0.34F * pulse);
+        event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, -insetX, -insetY, 0, 0,
+                width + insetX * 2, height + insetY * 2, 256, 256);
+        event.getGuiGraphics().setColor(0.40F, 0.32F, 0.06F, contamination * 0.18F);
+        event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, 0, 0, 0, 0, width, height, 256, 256);
         event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
