@@ -60,9 +60,7 @@ public final class BiosphereVisualEvents {
     @SubscribeEvent
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
         float contamination = ClientAtmosphereState.contamination();
-        boolean outside = !ClientBiosphereState.inside(event.getCamera().getPosition().x, event.getCamera().getPosition().y,
-                event.getCamera().getPosition().z);
-        float intensity = outside ? Math.max(0.72F, contamination) : exteriorHaze(event.getCamera());
+        float intensity = Math.max(contamination, exteriorHaze(event.getCamera()));
         if (intensity <= 0.0F) return;
         event.setRed(event.getRed() * (1.0F - intensity * 0.62F) + intensity * 0.46F);
         event.setGreen(event.getGreen() * (1.0F - intensity * 0.70F) + intensity * 0.38F);
@@ -73,9 +71,7 @@ public final class BiosphereVisualEvents {
     public static void onRenderFog(ViewportEvent.RenderFog event) {
         float contamination = ClientAtmosphereState.contamination();
         float boundaryHaze = exteriorHaze(event.getCamera());
-        boolean outside = !ClientBiosphereState.inside(event.getCamera().getPosition().x, event.getCamera().getPosition().y,
-                event.getCamera().getPosition().z);
-        float intensity = outside ? Math.max(0.72F, contamination) : Math.max(contamination, boundaryHaze);
+        float intensity = Math.max(contamination, boundaryHaze);
         if (intensity <= 0.0F) return;
         double exitDistance = protectedExitDistance(event.getCamera());
         if (exitDistance > 0.0D) {

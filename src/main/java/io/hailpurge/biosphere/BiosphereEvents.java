@@ -50,6 +50,7 @@ public final class BiosphereEvents {
         applyConsequences(player, band);
         state.update(exposure, band);
         state.save(player);
+        sync(player, exposure);
     }
 
     @SubscribeEvent
@@ -61,24 +62,24 @@ public final class BiosphereEvents {
 
     @SubscribeEvent
     public static void onLogin(PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) sync(player);
+        if (event.getEntity() instanceof ServerPlayer player) sync(player, ExposureState.read(player).exposure());
     }
 
     @SubscribeEvent
     public static void onDimensionChange(PlayerChangedDimensionEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) sync(player);
+        if (event.getEntity() instanceof ServerPlayer player) sync(player, ExposureState.read(player).exposure());
     }
 
-    static void sync(ServerPlayer player) {
+    static void sync(ServerPlayer player, int exposure) {
         ServerLevel overworld = player.server.overworld();
         InitialBiosphereData biosphere = InitialBiosphereData.get(overworld);
         BiosphereNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                new SyncBiospherePayload(ServerLevel.OVERWORLD, biosphere.centerX(), biosphere.centerY(), biosphere.centerZ(), biosphere.effectiveRadius(),
+                new SyncBiospherePayload(ServerLevel.OVERWORLD, biosphere.centerX(), biosphere.centerY(), biosphere.centerZ(), biosphere.effectiveRadius(), exposure,
                         BiosphereSectorsData.get(overworld).sectors().stream().map(sector -> new SyncBiospherePayload.Sector(sector.center(), sector.radius(), (float) sector.stability(), sector.status())).toList()));
     }
 
     public static void syncOverworld(ServerLevel overworld) {
-        for (ServerPlayer player : overworld.players()) sync(player);
+        for (ServerPlayer player : overworld.players()) sync(player, ExposureState.read(player).exposure());
     }
 
     private static void applyConsequences(ServerPlayer player, ExposureRules.ExposureBand band) {

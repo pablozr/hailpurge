@@ -14,13 +14,14 @@ import java.util.function.Supplier;
 
 import java.util.List;
 
-public record SyncBiospherePayload(ResourceKey<Level> dimension, double centerX, double centerY, double centerZ, int radius, List<Sector> sectors) {
+public record SyncBiospherePayload(ResourceKey<Level> dimension, double centerX, double centerY, double centerZ, int radius, int exposure, List<Sector> sectors) {
     public static void encode(SyncBiospherePayload payload, FriendlyByteBuf buffer) {
         buffer.writeResourceLocation(payload.dimension.location());
         buffer.writeDouble(payload.centerX);
         buffer.writeDouble(payload.centerY);
         buffer.writeDouble(payload.centerZ);
         buffer.writeVarInt(payload.radius);
+        buffer.writeVarInt(payload.exposure);
         buffer.writeVarInt(payload.sectors.size());
         for (Sector sector : payload.sectors) {
             buffer.writeBlockPos(sector.center());
@@ -32,7 +33,7 @@ public record SyncBiospherePayload(ResourceKey<Level> dimension, double centerX,
 
     public static SyncBiospherePayload decode(FriendlyByteBuf buffer) {
         return new SyncBiospherePayload(ResourceKey.create(net.minecraft.core.registries.Registries.DIMENSION,
-                buffer.readResourceLocation()), buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readVarInt(),
+                buffer.readResourceLocation()), buffer.readDouble(), buffer.readDouble(), buffer.readDouble(), buffer.readVarInt(), buffer.readVarInt(),
                 java.util.stream.IntStream.range(0, buffer.readVarInt()).mapToObj(ignored -> new Sector(buffer.readBlockPos(), buffer.readVarInt(), buffer.readFloat(), buffer.readEnum(SectorStatus.class))).toList());
     }
 
