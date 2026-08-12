@@ -98,6 +98,7 @@ public final class BiosphereVisualEvents {
                 double a1 = Math.PI * 2.0D * (longitude + 1) / longitudes;
                 double e0 = -Math.PI / 2.0D + Math.PI * latitude / latitudes;
                 double e1 = -Math.PI / 2.0D + Math.PI * (latitude + 1) / latitudes;
+                if (!surfaceIsExposed(field, field.centerX(), field.centerY(), field.centerZ(), field.radius(), a0, a1, e0, e1, true)) continue;
                 double wave = Math.sin(a0 * 3.0D + e0 * 7.0D - time);
                 double ring = Math.exp(-Math.pow((e0 + e1) * 0.5D / 0.16D, 2.0D));
                 double scan = Math.exp(-Math.pow((e0 + e1) * 0.5D - Math.sin(time * 0.32D) * 0.9D, 2.0D) / 0.014D);
@@ -138,6 +139,7 @@ public final class BiosphereVisualEvents {
                     double a1 = Math.PI * 2.0D * (longitude + 1) / 32.0D;
                     double e0 = -Math.PI / 2.0D + Math.PI * latitude / 16.0D;
                     double e1 = -Math.PI / 2.0D + Math.PI * (latitude + 1) / 16.0D;
+                    if (!surfaceIsExposed(field, centerX, centerY, centerZ, radius, a0, a1, e0, e1, false)) continue;
                     double wave = Math.sin(a0 * 3.0D + e0 * 7.0D - time);
                     double ring = Math.exp(-Math.pow((e0 + e1) * 0.5D / 0.16D, 2.0D));
                     double scan = Math.exp(-Math.pow((e0 + e1) * 0.5D - Math.sin(time * 0.32D) * 0.9D, 2.0D) / 0.014D);
@@ -151,6 +153,34 @@ public final class BiosphereVisualEvents {
             }
         }
         BufferUploader.drawWithShader(buffer.end());
+    }
+
+    private static boolean surfaceIsExposed(SyncBiospherePayload field, double centerX, double centerY, double centerZ,
+                                            double radius, double azimuthStart, double azimuthEnd, double elevationStart,
+                                            double elevationEnd, boolean initialField) {
+        double azimuth = (azimuthStart + azimuthEnd) * 0.5D;
+        double elevation = (elevationStart + elevationEnd) * 0.5D;
+        double cosElevation = Math.cos(elevation);
+        double x = centerX + radius * cosElevation * Math.cos(azimuth);
+        double y = centerY + radius * Math.sin(elevation);
+        double z = centerZ + radius * cosElevation * Math.sin(azimuth);
+
+        if (!initialField && inside(x, y, z, field.centerX(), field.centerY(), field.centerZ(), field.radius())) return false;
+        return field.sectors().stream().noneMatch(sector -> {
+            double sectorRadius = sector.radius() * sector.stability();
+            double sectorX = sector.center().getX() + 0.5D;
+            double sectorY = sector.center().getY() + sector.radius() / 2.0D;
+            double sectorZ = sector.center().getZ() + 0.5D;
+            boolean sameField = !initialField && sectorX == centerX && sectorY == centerY && sectorZ == centerZ;
+            return !sameField && sectorRadius > 0.0D && inside(x, y, z, sectorX, sectorY, sectorZ, sectorRadius);
+        });
+    }
+
+    private static boolean inside(double x, double y, double z, double centerX, double centerY, double centerZ, double radius) {
+        double dx = x - centerX;
+        double dy = y - centerY;
+        double dz = z - centerZ;
+        return dx * dx + dy * dy + dz * dz < radius * radius;
     }
 
     private static void addSectorVertex(BufferBuilder buffer, PoseStack poseStack, double centerX, double centerY, double centerZ,
