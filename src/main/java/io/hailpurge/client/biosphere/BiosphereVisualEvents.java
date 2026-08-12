@@ -32,22 +32,13 @@ public final class BiosphereVisualEvents {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null || !ClientBiosphereState.matches(minecraft.level)) return;
         var field = ClientBiosphereState.current();
-        double dx = minecraft.player.getX() - field.centerX();
-        double dy = minecraft.player.getY() - field.centerY();
-        double dz = minecraft.player.getZ() - field.centerZ();
-        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-        if (distance < 0.001D || Math.abs(distance - field.radius()) > 18.0D || minecraft.level.getGameTime() % 2 != 0) return;
-
-        double edgeX = field.centerX() + dx / distance * field.radius();
-        double edgeY = field.centerY() + dy / distance * field.radius();
-        double edgeZ = field.centerZ() + dz / distance * field.radius();
-        double tangentX = -dz / Math.sqrt(dx * dx + dz * dz);
-        double tangentZ = dx / Math.sqrt(dx * dx + dz * dz);
-        for (int i = -3; i <= 3; i++) {
-            double spread = i * 0.8D + (minecraft.level.random.nextDouble() - 0.5D) * 0.35D;
-            double y = edgeY + (minecraft.level.random.nextDouble() - 0.5D) * 5.0D;
-            minecraft.level.addParticle(CONTAINMENT_DUST, edgeX + tangentX * spread, y, edgeZ + tangentZ * spread,
-                    tangentX * 0.015D, 0.045D + minecraft.level.random.nextDouble() * 0.02D, tangentZ * 0.015D);
+        if (minecraft.level.getGameTime() % 2 == 0) {
+            spawnBoundaryParticles(minecraft, field, field.centerX(), field.centerY(), field.centerZ(), field.radius(), true);
+            for (var sector : field.sectors()) {
+                spawnBoundaryParticles(minecraft, field, sector.center().getX() + 0.5D,
+                        sector.center().getY() + sector.radius() / 2.0D, sector.center().getZ() + 0.5D,
+                        sector.radius() * sector.stability(), false);
+            }
         }
         for (var sector : field.sectors()) {
             if (sector.status() == SectorStatus.ACTIVE) continue;
@@ -59,6 +50,33 @@ public final class BiosphereVisualEvents {
             minecraft.level.addParticle(new DustParticleOptions(new Vector3f(color[0], color[1], color[2]), 1.45F),
                     sector.center().getX() + 0.5D, sector.center().getY() + 1.2D, sector.center().getZ() + 0.5D,
                     0.0D, 0.06D, 0.0D);
+        }
+    }
+
+    private static void spawnBoundaryParticles(Minecraft minecraft, SyncBiospherePayload field, double centerX, double centerY,
+                                               double centerZ, double radius, boolean initialField) {
+        double dx = minecraft.player.getX() - centerX;
+        double dy = minecraft.player.getY() - centerY;
+        double dz = minecraft.player.getZ() - centerZ;
+        double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
+        if (radius <= 0.0D || distance < 0.001D || horizontalDistance < 0.001D || Math.abs(distance - radius) > 18.0D) return;
+
+        double azimuth = Math.atan2(dz, dx);
+        double elevation = Math.asin(dy / distance);
+        if (!surfaceIsExposed(field, centerX, centerY, centerZ, radius, azimuth - 0.04D, azimuth + 0.04D,
+                elevation - 0.04D, elevation + 0.04D, initialField)) return;
+
+        double edgeX = centerX + dx / distance * radius;
+        double edgeY = centerY + dy / distance * radius;
+        double edgeZ = centerZ + dz / distance * radius;
+        double tangentX = -dz / horizontalDistance;
+        double tangentZ = dx / horizontalDistance;
+        for (int i = -3; i <= 3; i++) {
+            double spread = i * 0.8D + (minecraft.level.random.nextDouble() - 0.5D) * 0.35D;
+            double y = edgeY + (minecraft.level.random.nextDouble() - 0.5D) * 5.0D;
+            minecraft.level.addParticle(CONTAINMENT_DUST, edgeX + tangentX * spread, y, edgeZ + tangentZ * spread,
+                    tangentX * 0.015D, 0.045D + minecraft.level.random.nextDouble() * 0.02D, tangentZ * 0.015D);
         }
     }
 
