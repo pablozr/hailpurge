@@ -6,6 +6,7 @@
   "message.hailpurge.biosphere.exit": "Hostile atmosphere detected."
   ,"itemGroup.hailpurge.main": "HailPurge"
   ,"block.hailpurge.biosphere_anchor": "Biosphere Anchor",
+  ,"block.hailpurge.central_anchor": "Central Biosphere Anchor",
   "message.hailpurge.anchor.status": "Anchor energy: %s FE | %s | effective radius: %s | condition: %s%% (%s)"
   ,"message.hailpurge.anchor.state.offline": "No power; structure intact"
   ,"message.hailpurge.anchor.state.active": "Stable"
@@ -21,7 +22,7 @@
   ,"message.hailpurge.anchor.serviced": "Anchor preventive service complete."
   ,"message.hailpurge.anchor.service_unavailable": "Field service requires low load and an Anchor above critical condition."
   ,"message.hailpurge.anchor.disconnected": "Anchor must connect to the existing Biosphere network."
-  ,"message.hailpurge.anchor.limit": "The Shared Colony already operates four Anchors."
+  ,"message.hailpurge.anchor.limit": "The Shared Colony already operates five Anchors."
   ,"screen.hailpurge.anchor.title": "Biosphere Anchor Terminal"
   ,"screen.hailpurge.anchor.status": "Field status: %s"
   ,"screen.hailpurge.anchor.energy": "Energy reserve: %s / %s FE"

@@ -17,12 +17,22 @@ public final class BiosphereConfig {
     public static final ForgeConfigSpec.IntValue ANCHOR_LOW_POWER_SECONDS;
     public static final ForgeConfigSpec.DoubleValue ANCHOR_DEGRADATION;
     public static final ForgeConfigSpec.DoubleValue ANCHOR_RECOVERY;
+    public static final ForgeConfigSpec.IntValue CENTRAL_CONSUMPTION;
+    public static final ForgeConfigSpec.IntValue CENTRAL_CAPACITY;
+    public static final ForgeConfigSpec.IntValue CENTRAL_INITIAL_ENERGY;
+    public static final ForgeConfigSpec.IntValue CENTRAL_EMERGENCY_RADIUS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         builder.push("biosphere");
         INITIAL_RADIUS = builder.comment("Radius of the initial spherical Biosphere around the first Overworld spawn.")
                 .defineInRange("initialRadius", 48, 8, 512);
+        builder.pop();
+        builder.push("centralAnchor");
+        CENTRAL_CONSUMPTION = builder.defineInRange("energyPerSecond", 100, 1, 100000);
+        CENTRAL_CAPACITY = builder.defineInRange("energyCapacity", 100000, 1000, 10000000);
+        CENTRAL_INITIAL_ENERGY = builder.defineInRange("initialEnergy", 60000, 0, 10000000);
+        CENTRAL_EMERGENCY_RADIUS = builder.defineInRange("emergencyRadius", 12, 1, 512);
         builder.pop();
         builder.push("anchors");
         ANCHOR_RADIUS = builder.defineInRange("radius", 24, 4, 128);

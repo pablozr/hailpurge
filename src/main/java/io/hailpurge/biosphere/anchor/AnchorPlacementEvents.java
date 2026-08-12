@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = HailPurge.MOD_ID)
 public final class AnchorPlacementEvents {
-    private static final int MAXIMUM_ANCHORS = 4;
+    private static final int MAXIMUM_ANCHORS = 5;
 
     @SubscribeEvent
     public static void onPlace(BlockEvent.EntityPlaceEvent event) {
@@ -24,7 +24,7 @@ public final class AnchorPlacementEvents {
 
         var sectors = BiosphereSectorsData.get(level).sectors();
         var biosphere = InitialBiosphereData.get(level);
-        boolean hasCapacity = AnchorPlacementRules.hasCapacity(sectors, MAXIMUM_ANCHORS);
+        boolean hasCapacity = AnchorPlacementRules.hasCapacity(sectors, event.getPos(), MAXIMUM_ANCHORS);
         boolean allowed = hasCapacity && AnchorPlacementRules.connectsToNetwork(event.getPos(), BiosphereConfig.ANCHOR_RADIUS.get(),
                 level.getSharedSpawnPos(), biosphere.radius(), sectors);
         if (allowed) return;

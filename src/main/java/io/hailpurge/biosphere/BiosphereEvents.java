@@ -73,7 +73,7 @@ public final class BiosphereEvents {
         ServerLevel overworld = player.server.overworld();
         InitialBiosphereData biosphere = InitialBiosphereData.get(overworld);
         BiosphereNetwork.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player),
-                new SyncBiospherePayload(ServerLevel.OVERWORLD, biosphere.centerX(), biosphere.centerY(), biosphere.centerZ(), biosphere.radius(),
+                new SyncBiospherePayload(ServerLevel.OVERWORLD, biosphere.centerX(), biosphere.centerY(), biosphere.centerZ(), biosphere.effectiveRadius(),
                         BiosphereSectorsData.get(overworld).sectors().stream().map(sector -> new SyncBiospherePayload.Sector(sector.center(), sector.radius(), (float) sector.stability(), sector.status())).toList()));
     }
 

@@ -9,14 +9,15 @@ public final class AnchorPlacementRules {
     private AnchorPlacementRules() {
     }
 
-    public static boolean hasCapacity(Collection<BiosphereSector> sectors, int maximumAnchors) {
-        return sectors.size() < maximumAnchors;
+    public static boolean hasCapacity(Collection<BiosphereSector> sectors, BlockPos candidate, int maximumAnchors) {
+        return sectors.stream().filter(sector -> !sector.center().equals(candidate)).count() < maximumAnchors;
     }
 
     public static boolean connectsToNetwork(BlockPos candidate, int candidateRadius, BlockPos initialCenter, int initialRadius,
                                             Collection<BiosphereSector> sectors) {
         if (touches(candidate, candidateRadius, initialCenter, initialRadius)) return true;
-        return sectors.stream().anyMatch(sector -> touches(candidate, candidateRadius, sector.center(), sector.radius()));
+        return sectors.stream().filter(sector -> !sector.center().equals(candidate))
+                .anyMatch(sector -> touches(candidate, candidateRadius, sector.center(), sector.radius()));
     }
 
     private static boolean touches(BlockPos first, int firstRadius, BlockPos second, int secondRadius) {
