@@ -64,9 +64,9 @@ public final class BiosphereVisualEvents {
         float contamination = ClientAtmosphereState.contamination();
         float intensity = Math.max(contamination, exteriorHaze(event.getCamera()));
         if (intensity <= 0.0F) return;
-        event.setRed(event.getRed() * (1.0F - intensity * 0.62F) + intensity * 0.46F);
-        event.setGreen(event.getGreen() * (1.0F - intensity * 0.70F) + intensity * 0.38F);
-        event.setBlue(event.getBlue() * (1.0F - intensity * 0.94F) + intensity * 0.035F);
+        event.setRed(event.getRed() * (1.0F - intensity * 0.82F) + intensity * 0.25F);
+        event.setGreen(event.getGreen() * (1.0F - intensity * 0.86F) + intensity * 0.23F);
+        event.setBlue(event.getBlue() * (1.0F - intensity * 0.98F) + intensity * 0.025F);
     }
 
     @SubscribeEvent
@@ -79,7 +79,7 @@ public final class BiosphereVisualEvents {
         if (exitDistance > 0.0D) {
             event.setNearPlaneDistance((float) exitDistance);
             event.setFarPlaneDistance((float) (exitDistance + 26.0D));
-        } else event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 18.0F - contamination * 7.0F));
+        } else event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 13.0F - contamination * 5.0F));
     }
 
     @SubscribeEvent
@@ -89,20 +89,16 @@ public final class BiosphereVisualEvents {
         int width = event.getWindow().getGuiScaledWidth();
         int height = event.getWindow().getGuiScaledHeight();
         double time = Minecraft.getInstance().level == null ? 0.0D : Minecraft.getInstance().level.getGameTime() * 0.025D;
-        for (int blotch = 0; blotch < 6; blotch++) {
-            float phase = blotch * 1.73F;
-            float alpha = contamination * (0.11F + (float) Math.sin(time + phase) * 0.035F);
-            float x = (float) (width * (0.18D + blotch % 3 * 0.34D) + Math.sin(time * 0.63D + phase) * 34.0D);
-            float y = (float) (height * (0.22D + blotch / 3 * 0.48D) + Math.cos(time * 0.48D + phase) * 26.0D);
-            float size = 72.0F + blotch * 18.0F;
-            event.getGuiGraphics().pose().pushPose();
-            event.getGuiGraphics().pose().translate(x, y, 0.0F);
-            event.getGuiGraphics().pose().mulPose(Axis.ZP.rotationDegrees((float) (Math.sin(time * 0.37D + phase) * 24.0D)));
-            event.getGuiGraphics().setColor(0.78F, 0.68F, 0.20F, Math.max(0.0F, alpha));
-            event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, (int) -size, (int) -size, 0, 0, (int) (size * 2), (int) (size * 2), 128, 128);
-            event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
-            event.getGuiGraphics().pose().popPose();
-        }
+        float pulse = 0.86F + (float) Math.sin(time * 0.42D) * 0.08F;
+        float driftX = (float) Math.sin(time * 0.16D) * width * 0.06F;
+        float driftY = (float) Math.cos(time * 0.12D) * height * 0.04F;
+        event.getGuiGraphics().setColor(0.63F, 0.51F, 0.12F, contamination * 0.26F * pulse);
+        event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, (int) (-width * 0.18F + driftX), (int) (-height * 0.20F + driftY),
+                0, 0, (int) (width * 1.36F), (int) (height * 1.40F), 128, 128);
+        event.getGuiGraphics().setColor(0.42F, 0.36F, 0.08F, contamination * 0.18F);
+        event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, (int) (-width * 0.10F - driftX), (int) (-height * 0.12F - driftY),
+                0, 0, (int) (width * 1.24F), (int) (height * 1.28F), 128, 128);
+        event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     private static float exteriorHaze(net.minecraft.client.Camera camera) {
