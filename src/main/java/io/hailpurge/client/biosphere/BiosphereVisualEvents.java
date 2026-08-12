@@ -12,6 +12,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
@@ -26,6 +27,7 @@ import org.joml.Vector3f;
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public final class BiosphereVisualEvents {
     private static final DustParticleOptions CONTAINMENT_DUST = new DustParticleOptions(new Vector3f(0.18F, 0.92F, 0.88F), 1.15F);
+    private static final ResourceLocation CONTAMINATION_OVERLAY = new ResourceLocation("hailpurge", "textures/misc/contamination_overlay.png");
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
@@ -89,16 +91,16 @@ public final class BiosphereVisualEvents {
         double time = Minecraft.getInstance().level == null ? 0.0D : Minecraft.getInstance().level.getGameTime() * 0.025D;
         for (int blotch = 0; blotch < 6; blotch++) {
             float phase = blotch * 1.73F;
-            int alpha = (int) (contamination * (10.0F + (float) Math.sin(time + phase) * 4.0F));
-            int color = Math.max(0, alpha) << 24 | 0xC5A438;
+            float alpha = contamination * (0.11F + (float) Math.sin(time + phase) * 0.035F);
             float x = (float) (width * (0.18D + blotch % 3 * 0.34D) + Math.sin(time * 0.63D + phase) * 34.0D);
             float y = (float) (height * (0.22D + blotch / 3 * 0.48D) + Math.cos(time * 0.48D + phase) * 26.0D);
             float size = 72.0F + blotch * 18.0F;
             event.getGuiGraphics().pose().pushPose();
             event.getGuiGraphics().pose().translate(x, y, 0.0F);
             event.getGuiGraphics().pose().mulPose(Axis.ZP.rotationDegrees((float) (Math.sin(time * 0.37D + phase) * 24.0D)));
-            event.getGuiGraphics().fill((int) -size, (int) (-size * 0.28F), (int) size, (int) (size * 0.28F), color);
-            event.getGuiGraphics().fill((int) (-size * 0.42F), (int) (-size * 0.54F), (int) (size * 0.42F), (int) (size * 0.54F), color);
+            event.getGuiGraphics().setColor(0.78F, 0.68F, 0.20F, Math.max(0.0F, alpha));
+            event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, (int) -size, (int) -size, 0, 0, (int) (size * 2), (int) (size * 2), 128, 128);
+            event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
             event.getGuiGraphics().pose().popPose();
         }
     }
