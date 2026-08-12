@@ -19,6 +19,8 @@
   "message.hailpurge.anchor.recovering": "Biosphere Anchor containment is recovering.",
   "message.hailpurge.anchor.active": "Biosphere Anchor containment is stable.",
   "item.hailpurge.field_maintenance_kit": "Field Maintenance Kit",
+  "item.hailpurge.damaged_alternator": "Damaged Alternator",
+  "item.hailpurge.insulating_component": "Recovered Insulating Component",
   "message.hailpurge.anchor.serviced": "Anchor preventive service complete.",
   "message.hailpurge.anchor.service_unavailable": "Field service requires low load and an Anchor above critical condition.",
   "message.hailpurge.anchor.disconnected": "Anchor must connect to the existing Biosphere network.",
