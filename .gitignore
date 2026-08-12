@@ -1,0 +1,35 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+mcmodsrepo
+
+# Minecraft development runtime
+eclipse
+run
+run-data
+logs
+crash-reports
+
+# editor and operating system files
+.vscode
+.DS_Store
+Thumbs.db
+*.log
+
+# Files from Forge MDK
+forge*changelog.txt
