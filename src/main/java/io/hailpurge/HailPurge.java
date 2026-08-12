@@ -17,6 +17,7 @@ public final class HailPurge {
         var bus = FMLJavaModLoadingContext.get().getModEventBus();
         BiosphereContent.BLOCKS.register(bus);
         BiosphereContent.ITEMS.register(bus);
+        BiosphereContent.CREATIVE_TABS.register(bus);
         BiosphereContent.BLOCK_ENTITIES.register(bus);
     }
 }
