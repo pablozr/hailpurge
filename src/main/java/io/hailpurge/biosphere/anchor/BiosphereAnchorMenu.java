@@ -18,17 +18,19 @@ public final class BiosphereAnchorMenu extends AbstractContainerMenu {
         this(containerId, new ContainerData() {
             @Override public int get(int index) {
                 return switch (index) {
-                    case 0 -> anchor.energy();
-                    case 1 -> anchor.capacity();
-                    case 2 -> anchor.effectiveRadius();
-                    case 3 -> anchor.conditionPercent();
-                    case 4 -> anchor.status().ordinal();
-                    case 5 -> anchor.conditionBand().ordinal();
+                    case 0 -> anchor.energy() & 0xFFFF;
+                    case 1 -> anchor.energy() >>> 16;
+                    case 2 -> anchor.capacity() & 0xFFFF;
+                    case 3 -> anchor.capacity() >>> 16;
+                    case 4 -> anchor.effectiveRadius();
+                    case 5 -> anchor.conditionPercent();
+                    case 6 -> anchor.status().ordinal();
+                    case 7 -> anchor.conditionBand().ordinal();
                     default -> 0;
                 };
             }
             @Override public void set(int index, int value) { }
-            @Override public int getCount() { return 6; }
+            @Override public int getCount() { return 8; }
         }, anchor.isCentral());
     }
 
@@ -40,15 +42,15 @@ public final class BiosphereAnchorMenu extends AbstractContainerMenu {
     }
 
     public static BiosphereAnchorMenu fromNetwork(int containerId, Inventory inventory, FriendlyByteBuf buffer) {
-        return new BiosphereAnchorMenu(containerId, new SimpleContainerData(6), buffer.readBoolean());
+        return new BiosphereAnchorMenu(containerId, new SimpleContainerData(8), buffer.readBoolean());
     }
 
-    public int energy() { return data.get(0); }
-    public int capacity() { return data.get(1); }
-    public int radius() { return data.get(2); }
-    public int condition() { return data.get(3); }
-    public SectorStatus status() { return SectorStatus.values()[data.get(4)]; }
-    public AnchorCondition conditionBand() { return AnchorCondition.values()[data.get(5)]; }
+    public int energy() { return data.get(0) | data.get(1) << 16; }
+    public int capacity() { return data.get(2) | data.get(3) << 16; }
+    public int radius() { return data.get(4); }
+    public int condition() { return data.get(5); }
+    public SectorStatus status() { return SectorStatus.values()[data.get(6)]; }
+    public AnchorCondition conditionBand() { return AnchorCondition.values()[data.get(7)]; }
     public boolean central() { return central; }
     @Override public boolean stillValid(net.minecraft.world.entity.player.Player player) { return true; }
     @Override public ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int index) { return ItemStack.EMPTY; }

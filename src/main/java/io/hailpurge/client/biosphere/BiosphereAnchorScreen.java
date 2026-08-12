@@ -9,8 +9,8 @@ import net.minecraft.world.entity.player.Inventory;
 public final class BiosphereAnchorScreen extends AbstractContainerScreen<BiosphereAnchorMenu> {
     public BiosphereAnchorScreen(BiosphereAnchorMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        imageWidth = 230;
-        imageHeight = 155;
+        imageWidth = 330;
+        imageHeight = 176;
         titleLabelX = 16;
         titleLabelY = 14;
     }
@@ -31,13 +31,18 @@ public final class BiosphereAnchorScreen extends AbstractContainerScreen<Biosphe
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.energy", menu.energy(), menu.capacity()), 16, 53, 0xFFE5FFFF, false);
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.condition", menu.condition(), menu.conditionBand().name()), 16, 91, 0xFFE5FFFF, false);
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.radius", menu.radius()), 16, 120, 0xFFB8E7E1, false);
-        graphics.drawString(font, Component.translatable(menu.central() ? "screen.hailpurge.central_anchor.hint"
-                : "screen.hailpurge.anchor.hint"), 16, 137, 0xFF749A9B, false);
+        Component hint = Component.translatable(menu.central() ? "screen.hailpurge.central_anchor.hint"
+                : "screen.hailpurge.anchor.hint");
+        int lineY = 137;
+        for (var line : font.split(hint, 294)) {
+            graphics.drawString(font, line, 16, lineY, 0xFF749A9B, false);
+            lineY += 10;
+        }
     }
 
     private static void bar(GuiGraphics graphics, int x, int y, int value, int maximum, int color) {
-        graphics.fill(x, y, x + 198, y + 8, 0xFF081114);
-        int width = maximum == 0 ? 0 : Math.round(198.0F * value / maximum);
+        graphics.fill(x, y, x + 298, y + 8, 0xFF081114);
+        int width = maximum == 0 ? 0 : Math.round(298.0F * value / maximum);
         graphics.fill(x, y, x + width, y + 8, color);
     }
 }
