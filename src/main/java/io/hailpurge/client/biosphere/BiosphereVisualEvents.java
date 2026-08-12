@@ -41,11 +41,17 @@ public final class BiosphereVisualEvents {
             }
         }
         for (var sector : field.sectors()) {
-            if (sector.status() == SectorStatus.ACTIVE) continue;
             double sectorDx = minecraft.player.getX() - (sector.center().getX() + 0.5D);
             double sectorDz = minecraft.player.getZ() - (sector.center().getZ() + 0.5D);
             double sectorDistance = Math.sqrt(sectorDx * sectorDx + sectorDz * sectorDz);
-            if (sectorDistance > 32.0D || minecraft.level.getGameTime() % 8 != 0) continue;
+            if (sectorDistance > 32.0D) continue;
+            if (sector.status() == SectorStatus.ACTIVE && minecraft.level.getGameTime() % 4 == 0) {
+                minecraft.level.addParticle(CONTAINMENT_DUST, sector.center().getX() + 0.5D,
+                        sector.center().getY() + 13.5D, sector.center().getZ() + 0.5D,
+                        0.0D, 0.035D, 0.0D);
+                continue;
+            }
+            if (sector.status() == SectorStatus.ACTIVE || minecraft.level.getGameTime() % 8 != 0) continue;
             float[] color = statusColor(sector.status());
             minecraft.level.addParticle(new DustParticleOptions(new Vector3f(color[0], color[1], color[2]), 1.45F),
                     sector.center().getX() + 0.5D, sector.center().getY() + 1.2D, sector.center().getZ() + 0.5D,
