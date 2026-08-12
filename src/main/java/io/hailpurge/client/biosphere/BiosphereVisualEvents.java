@@ -88,15 +88,7 @@ public final class BiosphereVisualEvents {
         if (contamination <= 0.02F) return;
         int width = event.getWindow().getGuiScaledWidth();
         int height = event.getWindow().getGuiScaledHeight();
-        double time = Minecraft.getInstance().level == null ? 0.0D : Minecraft.getInstance().level.getGameTime() * 0.025D;
-        float pulse = 0.92F + (float) Math.sin(time * 0.16D) * 0.035F;
-        float advance = contamination * contamination;
-        int insetX = (int) (width * 0.16F * (1.0F - advance));
-        int insetY = (int) (height * 0.16F * (1.0F - advance));
-        event.getGuiGraphics().setColor(0.76F, 0.63F, 0.16F, contamination * 0.34F * pulse);
-        event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, -insetX, -insetY, 0, 0,
-                width + insetX * 2, height + insetY * 2, 256, 256);
-        event.getGuiGraphics().setColor(0.40F, 0.32F, 0.06F, contamination * 0.18F);
+        event.getGuiGraphics().setColor(0.76F, 0.63F, 0.16F, contamination * 0.42F);
         event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, 0, 0, 0, 0, width, height, 256, 256);
         event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
