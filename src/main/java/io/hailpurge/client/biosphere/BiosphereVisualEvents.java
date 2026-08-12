@@ -87,8 +87,18 @@ public final class BiosphereVisualEvents {
         int width = event.getWindow().getGuiScaledWidth();
         int height = event.getWindow().getGuiScaledHeight();
         float pulse = 0.96F + (float) Math.sin(Minecraft.getInstance().level.getGameTime() * 0.035D) * 0.04F;
-        int alpha = (int) (contamination * 42.0F * pulse);
-        event.getGuiGraphics().fill(0, 0, width, height, alpha << 24 | 0xB58D1D);
+        int layers = 10;
+        int maximumInset = (int) (Math.min(width, height) * 0.26F * contamination);
+        for (int layer = 0; layer < layers; layer++) {
+            int outerInset = layer * maximumInset / layers;
+            int innerInset = (layer + 1) * maximumInset / layers;
+            int alpha = (int) (contamination * pulse * (13.0F - layer));
+            int color = Math.max(0, alpha) << 24 | 0xB58D1D;
+            event.getGuiGraphics().fill(outerInset, outerInset, width - outerInset, innerInset, color);
+            event.getGuiGraphics().fill(outerInset, height - innerInset, width - outerInset, height - outerInset, color);
+            event.getGuiGraphics().fill(outerInset, innerInset, innerInset, height - innerInset, color);
+            event.getGuiGraphics().fill(width - innerInset, innerInset, width - outerInset, height - innerInset, color);
+        }
     }
 
     private static float exteriorHaze(net.minecraft.client.Camera camera) {
