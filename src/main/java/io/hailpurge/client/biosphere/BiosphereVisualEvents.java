@@ -45,12 +45,6 @@ public final class BiosphereVisualEvents {
             double sectorDz = minecraft.player.getZ() - (sector.center().getZ() + 0.5D);
             double sectorDistance = Math.sqrt(sectorDx * sectorDx + sectorDz * sectorDz);
             if (sectorDistance > 32.0D) continue;
-            if (sector.status() == SectorStatus.ACTIVE && minecraft.level.getGameTime() % 4 == 0) {
-                minecraft.level.addParticle(CONTAINMENT_DUST, sector.center().getX() + 0.5D,
-                        sector.center().getY() + 13.5D, sector.center().getZ() + 0.5D,
-                        0.0D, 0.035D, 0.0D);
-                continue;
-            }
             if (sector.status() == SectorStatus.ACTIVE || minecraft.level.getGameTime() % 8 != 0) continue;
             float[] color = statusColor(sector.status());
             minecraft.level.addParticle(new DustParticleOptions(new Vector3f(color[0], color[1], color[2]), 1.45F),
@@ -262,13 +256,14 @@ public final class BiosphereVisualEvents {
         BufferBuilder buffer = Tesselator.getInstance().getBuilder();
         buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         for (var sector : field.sectors()) {
-            if (sector.status() == SectorStatus.ACTIVE) continue;
             float[] color = statusColor(sector.status());
             double x = sector.center().getX() + 0.5D;
             double y = sector.center().getY() + 1.0D;
             double z = sector.center().getZ() + 0.5D;
-            double height = 18.0D + Math.sin(time * 2.0D) * 2.0D;
-            float alpha = sector.status() == SectorStatus.OFFLINE ? 0.28F : 0.48F;
+            double height = sector.status() == SectorStatus.ACTIVE ? 22.0D + Math.sin(time * 2.0D) * 2.0D
+                    : 18.0D + Math.sin(time * 2.0D) * 2.0D;
+            float alpha = sector.status() == SectorStatus.ACTIVE ? 0.34F
+                    : sector.status() == SectorStatus.OFFLINE ? 0.28F : 0.48F;
             buffer.vertex(poseStack.last().pose(), (float) (x - 0.22D), (float) y, (float) z).color(color[0], color[1], color[2], alpha).endVertex();
             buffer.vertex(poseStack.last().pose(), (float) (x + 0.22D), (float) y, (float) z).color(color[0], color[1], color[2], alpha).endVertex();
             buffer.vertex(poseStack.last().pose(), (float) (x + 0.06D), (float) (y + height), (float) z).color(color[0], color[1], color[2], 0.02F).endVertex();
