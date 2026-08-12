@@ -9,7 +9,7 @@ public final class ClientAtmosphereState {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null || !ClientBiosphereState.matches(minecraft.level)) return;
         boolean protectedArea = ClientBiosphereState.inside(minecraft.player.getX(), minecraft.player.getY(), minecraft.player.getZ());
-        float change = protectedArea ? -0.018F : minecraft.level.isNight() ? 0.012F : 0.005F;
+        float change = protectedArea ? -0.012F : minecraft.level.isNight() ? 0.0025F : 0.0012F;
         contamination = Math.max(0.0F, Math.min(1.0F, contamination + change));
     }
 

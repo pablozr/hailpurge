@@ -59,26 +59,61 @@ public final class BiosphereVisualEvents {
     @SubscribeEvent
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
         float contamination = ClientAtmosphereState.contamination();
-        if (contamination <= 0.0F) return;
-        event.setRed(event.getRed() * (1.0F - contamination * 0.18F) + contamination * 0.62F);
-        event.setGreen(event.getGreen() * (1.0F - contamination * 0.24F) + contamination * 0.54F);
-        event.setBlue(event.getBlue() * (1.0F - contamination * 0.60F) + contamination * 0.10F);
+        float boundaryHaze = boundaryHaze(event.getCamera());
+        float intensity = Math.max(contamination, boundaryHaze);
+        if (intensity <= 0.0F) return;
+        event.setRed(event.getRed() * (1.0F - intensity * 0.22F) + intensity * 0.48F);
+        event.setGreen(event.getGreen() * (1.0F - intensity * 0.30F) + intensity * 0.43F);
+        event.setBlue(event.getBlue() * (1.0F - intensity * 0.65F) + intensity * 0.08F);
     }
 
     @SubscribeEvent
     public static void onRenderFog(ViewportEvent.RenderFog event) {
         float contamination = ClientAtmosphereState.contamination();
-        if (contamination <= 0.0F) return;
-        event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 96.0F - contamination * 60.0F));
+        float intensity = Math.max(contamination, boundaryHaze(event.getCamera()));
+        if (intensity <= 0.0F) return;
+        event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 112.0F - intensity * 76.0F));
     }
 
     @SubscribeEvent
     public static void onOverlay(RenderGuiOverlayEvent.Post event) {
         float contamination = ClientAtmosphereState.contamination();
         if (contamination <= 0.02F) return;
-        int alpha = (int) (contamination * 105.0F);
-        event.getGuiGraphics().fill(0, 0, event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(),
-                alpha << 24 | 0xD1B044);
+        int width = event.getWindow().getGuiScaledWidth();
+        int height = event.getWindow().getGuiScaledHeight();
+        int layers = 5;
+        for (int layer = 0; layer < layers; layer++) {
+            int inset = layer * 9;
+            int alpha = (int) (contamination * (28 - layer * 4));
+            int color = alpha << 24 | 0xC5A438;
+            event.getGuiGraphics().fill(inset, inset, width - inset, inset + 9, color);
+            event.getGuiGraphics().fill(inset, height - inset - 9, width - inset, height - inset, color);
+            event.getGuiGraphics().fill(inset, inset + 9, inset + 9, height - inset - 9, color);
+            event.getGuiGraphics().fill(width - inset - 9, inset + 9, width - inset, height - inset - 9, color);
+        }
+    }
+
+    private static float boundaryHaze(net.minecraft.client.Camera camera) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level == null || !ClientBiosphereState.matches(minecraft.level)) return 0.0F;
+        var field = ClientBiosphereState.current();
+        double x = camera.getPosition().x;
+        double y = camera.getPosition().y;
+        double z = camera.getPosition().z;
+        double nearest = distanceToBoundary(x, y, z, field.centerX(), field.centerY(), field.centerZ(), field.radius());
+        for (var sector : field.sectors()) {
+            nearest = Math.min(nearest, distanceToBoundary(x, y, z, sector.center().getX() + 0.5D,
+                    sector.center().getY() + sector.radius() / 2.0D, sector.center().getZ() + 0.5D,
+                    sector.radius() * sector.stability()));
+        }
+        return nearest >= 0.0D && nearest < 14.0D ? (float) ((14.0D - nearest) / 14.0D * 0.42D) : 0.0F;
+    }
+
+    private static double distanceToBoundary(double x, double y, double z, double centerX, double centerY, double centerZ, double radius) {
+        double dx = x - centerX;
+        double dy = y - centerY;
+        double dz = z - centerZ;
+        return radius - Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
     private static void spawnBoundaryParticles(Minecraft minecraft, SyncBiospherePayload field, double centerX, double centerY,
