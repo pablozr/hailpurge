@@ -2,55 +2,54 @@ package io.hailpurge.biosphere.anchor;
 
 import io.hailpurge.biosphere.domain.AnchorCondition;
 import io.hailpurge.biosphere.domain.SectorStatus;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.item.ItemStack;
 
 public final class BiosphereAnchorMenu extends AbstractContainerMenu {
-    private final int energy;
-    private final int capacity;
-    private final int radius;
-    private final int condition;
-    private final SectorStatus status;
-    private final AnchorCondition conditionBand;
+    private final ContainerData data;
+    private final boolean central;
 
     public BiosphereAnchorMenu(int containerId, BiosphereAnchorBlockEntity anchor) {
-        this(containerId, anchor.energy(), anchor.capacity(), anchor.effectiveRadius(), anchor.conditionPercent(),
-                anchor.status(), anchor.conditionBand());
+        this(containerId, new ContainerData() {
+            @Override public int get(int index) {
+                return switch (index) {
+                    case 0 -> anchor.energy();
+                    case 1 -> anchor.capacity();
+                    case 2 -> anchor.effectiveRadius();
+                    case 3 -> anchor.conditionPercent();
+                    case 4 -> anchor.status().ordinal();
+                    case 5 -> anchor.conditionBand().ordinal();
+                    default -> 0;
+                };
+            }
+            @Override public void set(int index, int value) { }
+            @Override public int getCount() { return 6; }
+        }, anchor.isCentral());
     }
 
-    private BiosphereAnchorMenu(int containerId, int energy, int capacity, int radius, int condition,
-                                SectorStatus status, AnchorCondition conditionBand) {
+    private BiosphereAnchorMenu(int containerId, ContainerData data, boolean central) {
         super(BiosphereContent.ANCHOR_MENU.get(), containerId);
-        this.energy = energy;
-        this.capacity = capacity;
-        this.radius = radius;
-        this.condition = condition;
-        this.status = status;
-        this.conditionBand = conditionBand;
+        this.data = data;
+        this.central = central;
+        addDataSlots(data);
     }
 
     public static BiosphereAnchorMenu fromNetwork(int containerId, Inventory inventory, FriendlyByteBuf buffer) {
-        return new BiosphereAnchorMenu(containerId, buffer.readVarInt(), buffer.readVarInt(), buffer.readVarInt(),
-                buffer.readVarInt(), buffer.readEnum(SectorStatus.class), buffer.readEnum(AnchorCondition.class));
+        return new BiosphereAnchorMenu(containerId, new SimpleContainerData(6), buffer.readBoolean());
     }
 
-    public void writeData(FriendlyByteBuf buffer) {
-        buffer.writeVarInt(energy);
-        buffer.writeVarInt(capacity);
-        buffer.writeVarInt(radius);
-        buffer.writeVarInt(condition);
-        buffer.writeEnum(status);
-        buffer.writeEnum(conditionBand);
-    }
-
-    public int energy() { return energy; }
-    public int capacity() { return capacity; }
-    public int radius() { return radius; }
-    public int condition() { return condition; }
-    public SectorStatus status() { return status; }
-    public AnchorCondition conditionBand() { return conditionBand; }
+    public int energy() { return data.get(0); }
+    public int capacity() { return data.get(1); }
+    public int radius() { return data.get(2); }
+    public int condition() { return data.get(3); }
+    public SectorStatus status() { return SectorStatus.values()[data.get(4)]; }
+    public AnchorCondition conditionBand() { return AnchorCondition.values()[data.get(5)]; }
+    public boolean central() { return central; }
     @Override public boolean stillValid(net.minecraft.world.entity.player.Player player) { return true; }
     @Override public ItemStack quickMoveStack(net.minecraft.world.entity.player.Player player, int index) { return ItemStack.EMPTY; }
 }

@@ -81,7 +81,7 @@ public final class BiosphereVisualEvents {
         if (exitDistance > 0.0D) {
             event.setNearPlaneDistance((float) exitDistance);
             event.setFarPlaneDistance((float) (exitDistance + 26.0D));
-        } else event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 30.0F - contamination * 14.0F));
+        } else event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 18.0F - contamination * 7.0F));
     }
 
     @SubscribeEvent

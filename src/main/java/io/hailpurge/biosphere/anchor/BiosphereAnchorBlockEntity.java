@@ -107,7 +107,7 @@ public final class BiosphereAnchorBlockEntity extends BlockEntity {
     }
     @Override public <T> LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> type, Direction side) { return type == ForgeCapabilities.ENERGY ? capability.cast() : super.getCapability(type, side); }
     @Override public void invalidateCaps() { capability.invalidate(); super.invalidateCaps(); }
-    private boolean isCentral() { return getBlockState().is(BiosphereContent.CENTRAL_ANCHOR.get()); }
+    public boolean isCentral() { return getBlockState().is(BiosphereContent.CENTRAL_ANCHOR.get()); }
     private void tickCentral(ServerLevel level) {
         int cost = BiosphereConfig.CENTRAL_CONSUMPTION.get();
         if (energy.getEnergyStored() >= cost) {

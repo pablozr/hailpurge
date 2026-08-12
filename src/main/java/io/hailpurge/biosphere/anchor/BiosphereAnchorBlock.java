@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -17,6 +18,7 @@ import net.minecraftforge.network.NetworkHooks;
 
 public final class BiosphereAnchorBlock extends BaseEntityBlock {
     public BiosphereAnchorBlock(Properties properties) { super(properties); }
+    @Override public RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     @Override public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new BiosphereAnchorBlockEntity(pos, state); }
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return type == BiosphereContent.ANCHOR_ENTITY.get() ? (tickLevel, tickPos, tickState, entity) -> BiosphereAnchorBlockEntity.tick(tickLevel, tickPos, tickState, (BiosphereAnchorBlockEntity) entity) : null;
@@ -31,11 +33,12 @@ public final class BiosphereAnchorBlock extends BaseEntityBlock {
                 } else player.displayClientMessage(Component.translatable("message.hailpurge.anchor.service_unavailable"), true);
             } else NetworkHooks.openScreen((net.minecraft.server.level.ServerPlayer) player,
                     new net.minecraft.world.MenuProvider() {
-                        @Override public Component getDisplayName() { return Component.translatable("screen.hailpurge.anchor.title"); }
+                        @Override public Component getDisplayName() { return Component.translatable(anchor.isCentral()
+                                ? "screen.hailpurge.central_anchor.title" : "screen.hailpurge.anchor.title"); }
                         @Override public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int id, net.minecraft.world.entity.player.Inventory inventory, Player openedBy) {
                             return new BiosphereAnchorMenu(id, anchor);
                         }
-                    }, buffer -> new BiosphereAnchorMenu(0, anchor).writeData(buffer));
+                    }, buffer -> buffer.writeBoolean(anchor.isCentral()));
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }

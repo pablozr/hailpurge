@@ -28,5 +28,7 @@
   "screen.hailpurge.anchor.energy": "Energy reserve: %s / %s FE",
   "screen.hailpurge.anchor.condition": "Condition: %s%% (%s)",
   "screen.hailpurge.anchor.radius": "Effective radius: %s blocks",
-  "screen.hailpurge.anchor.hint": "Use a Field Maintenance Kit during low load."
+  "screen.hailpurge.anchor.hint": "Use a Field Maintenance Kit during low load.",
+  "screen.hailpurge.central_anchor.title": "Central Biosphere Anchor Terminal",
+  "screen.hailpurge.central_anchor.hint": "Central Anchor: protect this system and keep its reserve charged."
 }

@@ -31,7 +31,8 @@ public final class BiosphereAnchorScreen extends AbstractContainerScreen<Biosphe
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.energy", menu.energy(), menu.capacity()), 16, 53, 0xFFE5FFFF, false);
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.condition", menu.condition(), menu.conditionBand().name()), 16, 91, 0xFFE5FFFF, false);
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.radius", menu.radius()), 16, 120, 0xFFB8E7E1, false);
-        graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.hint"), 16, 137, 0xFF749A9B, false);
+        graphics.drawString(font, Component.translatable(menu.central() ? "screen.hailpurge.central_anchor.hint"
+                : "screen.hailpurge.anchor.hint"), 16, 137, 0xFF749A9B, false);
     }
 
     private static void bar(GuiGraphics graphics, int x, int y, int value, int maximum, int color) {
