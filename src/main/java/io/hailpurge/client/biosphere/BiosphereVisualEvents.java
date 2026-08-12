@@ -3,7 +3,6 @@ package io.hailpurge.client.biosphere;
 import io.hailpurge.biosphere.domain.SectorStatus;
 import io.hailpurge.biosphere.network.SyncBiospherePayload;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -13,7 +12,6 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
@@ -28,7 +26,6 @@ import org.joml.Vector3f;
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public final class BiosphereVisualEvents {
     private static final DustParticleOptions CONTAINMENT_DUST = new DustParticleOptions(new Vector3f(0.18F, 0.92F, 0.88F), 1.15F);
-    private static final ResourceLocation CONTAMINATION_VIGNETTE = new ResourceLocation("hailpurge", "textures/misc/contamination_vignette.png");
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
@@ -81,22 +78,6 @@ public final class BiosphereVisualEvents {
             event.setNearPlaneDistance((float) exitDistance);
             event.setFarPlaneDistance((float) (exitDistance + 26.0D));
         } else event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 13.0F - contamination * 5.0F));
-    }
-
-    @SubscribeEvent
-    public static void onOverlay(RenderGuiOverlayEvent.Post event) {
-        float contamination = ClientAtmosphereState.contamination();
-        if (contamination <= 0.02F) return;
-        int width = event.getWindow().getGuiScaledWidth();
-        int height = event.getWindow().getGuiScaledHeight();
-        float pulse = 0.96F + (float) Math.sin(Minecraft.getInstance().level.getGameTime() * 0.025D) * 0.025F;
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
-                GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        event.getGuiGraphics().setColor(0.78F, 0.64F, 0.14F, contamination * 0.38F * pulse);
-        event.getGuiGraphics().blit(CONTAMINATION_VIGNETTE, 0, 0, 0, 0, width, height, 256, 256);
-        event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.disableBlend();
     }
 
     private static float exteriorHaze(net.minecraft.client.Camera camera) {
