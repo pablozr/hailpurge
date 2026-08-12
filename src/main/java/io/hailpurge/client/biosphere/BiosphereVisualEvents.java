@@ -9,6 +9,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.DustParticleOptions;
@@ -59,8 +60,7 @@ public final class BiosphereVisualEvents {
     @SubscribeEvent
     public static void onFogColor(ViewportEvent.ComputeFogColor event) {
         float contamination = ClientAtmosphereState.contamination();
-        float boundaryHaze = boundaryHaze(event.getCamera());
-        float intensity = Math.max(contamination, boundaryHaze);
+        float intensity = Math.max(contamination, exteriorHaze(event.getCamera()));
         if (intensity <= 0.0F) return;
         event.setRed(event.getRed() * (1.0F - intensity * 0.22F) + intensity * 0.48F);
         event.setGreen(event.getGreen() * (1.0F - intensity * 0.30F) + intensity * 0.43F);
@@ -70,7 +70,7 @@ public final class BiosphereVisualEvents {
     @SubscribeEvent
     public static void onRenderFog(ViewportEvent.RenderFog event) {
         float contamination = ClientAtmosphereState.contamination();
-        float intensity = Math.max(contamination, boundaryHaze(event.getCamera()));
+        float intensity = Math.max(contamination, exteriorHaze(event.getCamera()));
         if (intensity <= 0.0F) return;
         event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 112.0F - intensity * 76.0F));
     }
@@ -81,21 +81,27 @@ public final class BiosphereVisualEvents {
         if (contamination <= 0.02F) return;
         int width = event.getWindow().getGuiScaledWidth();
         int height = event.getWindow().getGuiScaledHeight();
-        int layers = 5;
-        for (int layer = 0; layer < layers; layer++) {
-            int inset = layer * 9;
-            int alpha = (int) (contamination * (28 - layer * 4));
-            int color = alpha << 24 | 0xC5A438;
-            event.getGuiGraphics().fill(inset, inset, width - inset, inset + 9, color);
-            event.getGuiGraphics().fill(inset, height - inset - 9, width - inset, height - inset, color);
-            event.getGuiGraphics().fill(inset, inset + 9, inset + 9, height - inset - 9, color);
-            event.getGuiGraphics().fill(width - inset - 9, inset + 9, width - inset, height - inset - 9, color);
+        double time = Minecraft.getInstance().level == null ? 0.0D : Minecraft.getInstance().level.getGameTime() * 0.025D;
+        for (int blotch = 0; blotch < 6; blotch++) {
+            float phase = blotch * 1.73F;
+            int alpha = (int) (contamination * (10.0F + (float) Math.sin(time + phase) * 4.0F));
+            int color = Math.max(0, alpha) << 24 | 0xC5A438;
+            float x = (float) (width * (0.18D + blotch % 3 * 0.34D) + Math.sin(time * 0.63D + phase) * 34.0D);
+            float y = (float) (height * (0.22D + blotch / 3 * 0.48D) + Math.cos(time * 0.48D + phase) * 26.0D);
+            float size = 72.0F + blotch * 18.0F;
+            event.getGuiGraphics().pose().pushPose();
+            event.getGuiGraphics().pose().translate(x, y, 0.0F);
+            event.getGuiGraphics().pose().mulPose(Axis.ZP.rotationDegrees((float) (Math.sin(time * 0.37D + phase) * 24.0D)));
+            event.getGuiGraphics().fill((int) -size, (int) (-size * 0.28F), (int) size, (int) (size * 0.28F), color);
+            event.getGuiGraphics().fill((int) (-size * 0.42F), (int) (-size * 0.54F), (int) (size * 0.42F), (int) (size * 0.54F), color);
+            event.getGuiGraphics().pose().popPose();
         }
     }
 
-    private static float boundaryHaze(net.minecraft.client.Camera camera) {
+    private static float exteriorHaze(net.minecraft.client.Camera camera) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || !ClientBiosphereState.matches(minecraft.level)) return 0.0F;
+        if (ClientBiosphereState.inside(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z)) return 0.20F;
         var field = ClientBiosphereState.current();
         double x = camera.getPosition().x;
         double y = camera.getPosition().y;
