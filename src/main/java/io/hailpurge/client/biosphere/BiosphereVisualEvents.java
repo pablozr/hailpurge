@@ -3,6 +3,7 @@ package io.hailpurge.client.biosphere;
 import io.hailpurge.biosphere.domain.SectorStatus;
 import io.hailpurge.biosphere.network.SyncBiospherePayload;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
@@ -92,7 +93,8 @@ public final class BiosphereVisualEvents {
         int height = event.getWindow().getGuiScaledHeight();
         float pulse = 0.94F + (float) Math.sin(Minecraft.getInstance().level.getGameTime() * 0.04D) * 0.06F;
         RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         event.getGuiGraphics().setColor(0.76F, 0.63F, 0.16F, contamination * 0.42F * pulse);
         event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, 0, 0, 0, 0, width, height, 256, 256);
         event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
