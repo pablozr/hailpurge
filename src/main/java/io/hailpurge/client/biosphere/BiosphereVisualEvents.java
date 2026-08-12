@@ -88,9 +88,12 @@ public final class BiosphereVisualEvents {
         if (contamination <= 0.02F) return;
         int width = event.getWindow().getGuiScaledWidth();
         int height = event.getWindow().getGuiScaledHeight();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         event.getGuiGraphics().setColor(0.76F, 0.63F, 0.16F, contamination * 0.42F);
         event.getGuiGraphics().blit(CONTAMINATION_OVERLAY, 0, 0, 0, 0, width, height, 256, 256);
         event.getGuiGraphics().setColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.disableBlend();
     }
 
     private static float exteriorHaze(net.minecraft.client.Camera camera) {
