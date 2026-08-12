@@ -70,9 +70,14 @@ public final class BiosphereVisualEvents {
     @SubscribeEvent
     public static void onRenderFog(ViewportEvent.RenderFog event) {
         float contamination = ClientAtmosphereState.contamination();
-        float intensity = Math.max(contamination, exteriorHaze(event.getCamera()));
+        float boundaryHaze = exteriorHaze(event.getCamera());
+        float intensity = Math.max(contamination, boundaryHaze);
         if (intensity <= 0.0F) return;
-        event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 112.0F - intensity * 76.0F));
+        double exitDistance = protectedExitDistance(event.getCamera());
+        if (exitDistance > 0.0D) {
+            event.setNearPlaneDistance((float) exitDistance);
+            event.setFarPlaneDistance((float) (exitDistance + 26.0D));
+        } else event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 72.0F - contamination * 44.0F));
     }
 
     @SubscribeEvent
@@ -101,7 +106,7 @@ public final class BiosphereVisualEvents {
     private static float exteriorHaze(net.minecraft.client.Camera camera) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level == null || !ClientBiosphereState.matches(minecraft.level)) return 0.0F;
-        if (ClientBiosphereState.inside(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z)) return 0.20F;
+        if (ClientBiosphereState.inside(camera.getPosition().x, camera.getPosition().y, camera.getPosition().z)) return 0.58F;
         var field = ClientBiosphereState.current();
         double x = camera.getPosition().x;
         double y = camera.getPosition().y;
@@ -113,6 +118,34 @@ public final class BiosphereVisualEvents {
                     sector.radius() * sector.stability()));
         }
         return nearest >= 0.0D && nearest < 14.0D ? (float) ((14.0D - nearest) / 14.0D * 0.42D) : 0.0F;
+    }
+
+    private static double protectedExitDistance(net.minecraft.client.Camera camera) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.level == null || !ClientBiosphereState.matches(minecraft.level)) return -1.0D;
+        var field = ClientBiosphereState.current();
+        double x = camera.getPosition().x;
+        double y = camera.getPosition().y;
+        double z = camera.getPosition().z;
+        var look = camera.getLookVector();
+        double farthestExit = rayExitDistance(x, y, z, look.x, look.y, look.z, field.centerX(), field.centerY(), field.centerZ(), field.radius());
+        for (var sector : field.sectors()) {
+            farthestExit = Math.max(farthestExit, rayExitDistance(x, y, z, look.x, look.y, look.z,
+                    sector.center().getX() + 0.5D, sector.center().getY() + sector.radius() / 2.0D,
+                    sector.center().getZ() + 0.5D, sector.radius() * sector.stability()));
+        }
+        return farthestExit;
+    }
+
+    private static double rayExitDistance(double x, double y, double z, double lookX, double lookY, double lookZ,
+                                          double centerX, double centerY, double centerZ, double radius) {
+        double ox = x - centerX;
+        double oy = y - centerY;
+        double oz = z - centerZ;
+        double inside = radius * radius - ox * ox - oy * oy - oz * oz;
+        if (inside < 0.0D) return -1.0D;
+        double projection = ox * lookX + oy * lookY + oz * lookZ;
+        return -projection + Math.sqrt(projection * projection + inside);
     }
 
     private static double distanceToBoundary(double x, double y, double z, double centerX, double centerY, double centerZ, double radius) {
