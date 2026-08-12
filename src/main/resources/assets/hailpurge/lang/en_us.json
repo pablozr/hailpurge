@@ -3,10 +3,10 @@
   "message.hailpurge.atmosphere.warning": "Warning: hostile atmosphere exposure rising.",
   "message.hailpurge.atmosphere.critical": "Critical: seek a Biosphere or full protection immediately.",
   "message.hailpurge.biosphere.enter": "Atmospheric containment restored.",
-  "message.hailpurge.biosphere.exit": "Hostile atmosphere detected."
-  ,"itemGroup.hailpurge.main": "HailPurge"
+  "message.hailpurge.biosphere.exit": "Hostile atmosphere detected.",
+  "itemGroup.hailpurge.main": "HailPurge",
   ,"block.hailpurge.biosphere_anchor": "Biosphere Anchor",
-  ,"block.hailpurge.central_anchor": "Central Biosphere Anchor",
+  "block.hailpurge.central_anchor": "Central Biosphere Anchor",
   "message.hailpurge.anchor.status": "Anchor energy: %s FE | %s | effective radius: %s | condition: %s%% (%s)"
   ,"message.hailpurge.anchor.state.offline": "No power; structure intact"
   ,"message.hailpurge.anchor.state.active": "Stable"
