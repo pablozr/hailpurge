@@ -15,7 +15,9 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.joml.Vector3f;
@@ -28,6 +30,7 @@ public final class BiosphereVisualEvents {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         ClientBiosphereState.updateCrossing();
+        ClientAtmosphereState.tick();
 
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.level == null || !ClientBiosphereState.matches(minecraft.level)) return;
@@ -51,6 +54,31 @@ public final class BiosphereVisualEvents {
                     sector.center().getX() + 0.5D, sector.center().getY() + 1.2D, sector.center().getZ() + 0.5D,
                     0.0D, 0.06D, 0.0D);
         }
+    }
+
+    @SubscribeEvent
+    public static void onFogColor(ViewportEvent.ComputeFogColor event) {
+        float contamination = ClientAtmosphereState.contamination();
+        if (contamination <= 0.0F) return;
+        event.setRed(event.getRed() * (1.0F - contamination * 0.18F) + contamination * 0.62F);
+        event.setGreen(event.getGreen() * (1.0F - contamination * 0.24F) + contamination * 0.54F);
+        event.setBlue(event.getBlue() * (1.0F - contamination * 0.60F) + contamination * 0.10F);
+    }
+
+    @SubscribeEvent
+    public static void onRenderFog(ViewportEvent.RenderFog event) {
+        float contamination = ClientAtmosphereState.contamination();
+        if (contamination <= 0.0F) return;
+        event.setFarPlaneDistance(Math.min(event.getFarPlaneDistance(), 96.0F - contamination * 60.0F));
+    }
+
+    @SubscribeEvent
+    public static void onOverlay(RenderGuiOverlayEvent.Post event) {
+        float contamination = ClientAtmosphereState.contamination();
+        if (contamination <= 0.02F) return;
+        int alpha = (int) (contamination * 105.0F);
+        event.getGuiGraphics().fill(0, 0, event.getWindow().getGuiScaledWidth(), event.getWindow().getGuiScaledHeight(),
+                alpha << 24 | 0xD1B044);
     }
 
     private static void spawnBoundaryParticles(Minecraft minecraft, SyncBiospherePayload field, double centerX, double centerY,
@@ -283,7 +311,10 @@ public final class BiosphereVisualEvents {
 
     @SubscribeEvent
     public static void onClientLogout(LevelEvent.Unload event) {
-        if (event.getLevel().isClientSide()) ClientBiosphereState.clear();
+        if (event.getLevel().isClientSide()) {
+            ClientBiosphereState.clear();
+            ClientAtmosphereState.clear();
+        }
     }
 
     private BiosphereVisualEvents() {}

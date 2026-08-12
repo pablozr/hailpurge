@@ -1,6 +1,7 @@
 {
   "ambientocclusion": false,
   "textures": {
+    "particle": "hailpurge:block/anchor_dark",
     "frame": "hailpurge:block/anchor_dark",
     "dark": "hailpurge:block/anchor_dark",
     "coil": "hailpurge:block/anchor_frame",
