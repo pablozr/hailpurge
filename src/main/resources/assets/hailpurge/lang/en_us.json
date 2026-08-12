@@ -22,4 +22,10 @@
   ,"message.hailpurge.anchor.service_unavailable": "Field service requires low load and an Anchor above critical condition."
   ,"message.hailpurge.anchor.disconnected": "Anchor must connect to the existing Biosphere network."
   ,"message.hailpurge.anchor.limit": "The Shared Colony already operates four Anchors."
+  ,"screen.hailpurge.anchor.title": "Biosphere Anchor Terminal"
+  ,"screen.hailpurge.anchor.status": "Field status: %s"
+  ,"screen.hailpurge.anchor.energy": "Energy reserve: %s / %s FE"
+  ,"screen.hailpurge.anchor.condition": "Condition: %s%% (%s)"
+  ,"screen.hailpurge.anchor.radius": "Effective radius: %s blocks"
+  ,"screen.hailpurge.anchor.hint": "Use a Field Maintenance Kit during low load."
 }

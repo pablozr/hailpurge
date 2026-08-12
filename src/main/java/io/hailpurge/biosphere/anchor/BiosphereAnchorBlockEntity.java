@@ -59,6 +59,7 @@ public final class BiosphereAnchorBlockEntity extends BlockEntity {
         }
     }
     public int energy() { return energy.getEnergyStored(); }
+    public int capacity() { return energy.getMaxEnergyStored(); }
     public SectorStatus status() { return status; }
     public int effectiveRadius() { return (int) Math.round(BiosphereConfig.ANCHOR_RADIUS.get() * stability); }
     public int conditionPercent() { return (int) Math.round(condition * 100.0D); }

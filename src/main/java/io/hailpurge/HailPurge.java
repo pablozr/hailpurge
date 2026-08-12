@@ -19,5 +19,6 @@ public final class HailPurge {
         BiosphereContent.ITEMS.register(bus);
         BiosphereContent.CREATIVE_TABS.register(bus);
         BiosphereContent.BLOCK_ENTITIES.register(bus);
+        BiosphereContent.MENUS.register(bus);
     }
 }

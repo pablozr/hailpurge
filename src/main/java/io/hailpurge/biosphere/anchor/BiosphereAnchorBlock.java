@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.network.NetworkHooks;
 
 public final class BiosphereAnchorBlock extends BaseEntityBlock {
     public BiosphereAnchorBlock(Properties properties) { super(properties); }
@@ -28,9 +29,13 @@ public final class BiosphereAnchorBlock extends BaseEntityBlock {
                     held.shrink(1);
                     player.displayClientMessage(Component.translatable("message.hailpurge.anchor.serviced"), true);
                 } else player.displayClientMessage(Component.translatable("message.hailpurge.anchor.service_unavailable"), true);
-            } else player.displayClientMessage(Component.translatable("message.hailpurge.anchor.status", anchor.energy(),
-                    Component.translatable("message.hailpurge.anchor.state." + anchor.status().name().toLowerCase()),
-                    anchor.effectiveRadius(), anchor.conditionPercent(), anchor.conditionBand().name()), true);
+            } else NetworkHooks.openScreen((net.minecraft.server.level.ServerPlayer) player,
+                    new net.minecraft.world.MenuProvider() {
+                        @Override public Component getDisplayName() { return Component.translatable("screen.hailpurge.anchor.title"); }
+                        @Override public net.minecraft.world.inventory.AbstractContainerMenu createMenu(int id, net.minecraft.world.entity.player.Inventory inventory, Player openedBy) {
+                            return new BiosphereAnchorMenu(id, anchor);
+                        }
+                    }, buffer -> new BiosphereAnchorMenu(0, anchor).writeData(buffer));
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
