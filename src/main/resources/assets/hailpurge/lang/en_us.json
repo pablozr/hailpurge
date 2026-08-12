@@ -4,8 +4,14 @@
   "message.hailpurge.atmosphere.critical": "Critical: seek a Biosphere or full protection immediately.",
   "message.hailpurge.biosphere.enter": "Atmospheric containment restored.",
   "message.hailpurge.biosphere.exit": "Hostile atmosphere detected."
+  ,"itemGroup.hailpurge.main": "HailPurge"
   ,"block.hailpurge.biosphere_anchor": "Biosphere Anchor",
   "message.hailpurge.anchor.status": "Anchor energy: %s FE | %s | effective radius: %s | condition: %s%% (%s)"
+  ,"message.hailpurge.anchor.state.offline": "No power; structure intact"
+  ,"message.hailpurge.anchor.state.active": "Stable"
+  ,"message.hailpurge.anchor.state.low_power": "Low power"
+  ,"message.hailpurge.anchor.state.degrading": "Containment degrading"
+  ,"message.hailpurge.anchor.state.recovering": "Recovering"
   ,"message.hailpurge.anchor.low_power": "Biosphere Anchor reserve is low."
   ,"message.hailpurge.anchor.degrading": "Biosphere Anchor containment is degrading."
   ,"message.hailpurge.anchor.offline": "Biosphere Anchor containment is offline."

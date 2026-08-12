@@ -111,11 +111,50 @@ public final class BiosphereVisualEvents {
         }
         BufferUploader.drawWithShader(buffer.end());
         renderGrid(poseStack, field, time);
+        renderAnchorFields(poseStack, field, camera.x, camera.y, camera.z, renderDistance, time);
         renderAnchorSignals(poseStack, field, time);
         RenderSystem.depthMask(true);
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
         poseStack.popPose();
+    }
+
+    private static void renderAnchorFields(PoseStack poseStack, SyncBiospherePayload field, double cameraX, double cameraY,
+                                           double cameraZ, double renderDistance, double time) {
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        BufferBuilder buffer = Tesselator.getInstance().getBuilder();
+        buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        for (var sector : field.sectors()) {
+            double radius = sector.radius() * sector.stability();
+            double centerX = sector.center().getX() + 0.5D;
+            double centerY = sector.center().getY() + sector.radius() / 2.0D;
+            double centerZ = sector.center().getZ() + 0.5D;
+            double distance = Math.sqrt(Math.pow(cameraX - centerX, 2.0D) + Math.pow(cameraY - centerY, 2.0D) + Math.pow(cameraZ - centerZ, 2.0D));
+            if (radius <= 0.0D || distance - radius > renderDistance) continue;
+            float[] color = statusColor(sector.status());
+            float alpha = sector.status() == SectorStatus.ACTIVE ? 0.14F : 0.24F + (float) (Math.sin(time * 2.0D) * 0.07D);
+            for (int latitude = 0; latitude < 12; latitude++) {
+                for (int longitude = 0; longitude < 24; longitude++) {
+                    double a0 = Math.PI * 2.0D * longitude / 24.0D;
+                    double a1 = Math.PI * 2.0D * (longitude + 1) / 24.0D;
+                    double e0 = -Math.PI / 2.0D + Math.PI * latitude / 12.0D;
+                    double e1 = -Math.PI / 2.0D + Math.PI * (latitude + 1) / 12.0D;
+                    addSectorVertex(buffer, poseStack, centerX, centerY, centerZ, radius, a0, e0, color, alpha);
+                    addSectorVertex(buffer, poseStack, centerX, centerY, centerZ, radius, a1, e0, color, alpha);
+                    addSectorVertex(buffer, poseStack, centerX, centerY, centerZ, radius, a1, e1, color, alpha);
+                    addSectorVertex(buffer, poseStack, centerX, centerY, centerZ, radius, a0, e1, color, alpha);
+                }
+            }
+        }
+        BufferUploader.drawWithShader(buffer.end());
+    }
+
+    private static void addSectorVertex(BufferBuilder buffer, PoseStack poseStack, double centerX, double centerY, double centerZ,
+                                        double radius, double azimuth, double elevation, float[] color, float alpha) {
+        double cosElevation = Math.cos(elevation);
+        buffer.vertex(poseStack.last().pose(), (float) (centerX + radius * cosElevation * Math.cos(azimuth)),
+                (float) (centerY + radius * Math.sin(elevation)), (float) (centerZ + radius * cosElevation * Math.sin(azimuth)))
+                .color(color[0], color[1], color[2], alpha).endVertex();
     }
 
     private static void renderGrid(PoseStack poseStack, SyncBiospherePayload field, double time) {

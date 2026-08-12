@@ -69,7 +69,12 @@ public final class BiosphereAnchorBlockEntity extends BlockEntity {
         setChanged();
         return true;
     }
-    public void removeSector() { if (level instanceof ServerLevel server) BiosphereSectorsData.get(server).remove(worldPosition); }
+    public void removeSector() {
+        if (level instanceof ServerLevel server) {
+            BiosphereSectorsData.get(server).remove(worldPosition);
+            BiosphereEvents.syncOverworld(server);
+        }
+    }
     private static void alert(ServerLevel level, SectorStatus status) {
         String key = switch (status) {
             case LOW_POWER -> "message.hailpurge.anchor.low_power";

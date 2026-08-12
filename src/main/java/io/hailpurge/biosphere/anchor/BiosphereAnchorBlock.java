@@ -28,7 +28,9 @@ public final class BiosphereAnchorBlock extends BaseEntityBlock {
                     held.shrink(1);
                     player.displayClientMessage(Component.translatable("message.hailpurge.anchor.serviced"), true);
                 } else player.displayClientMessage(Component.translatable("message.hailpurge.anchor.service_unavailable"), true);
-            } else player.displayClientMessage(Component.translatable("message.hailpurge.anchor.status", anchor.energy(), anchor.status().name(), anchor.effectiveRadius(), anchor.conditionPercent(), anchor.conditionBand().name()), true);
+            } else player.displayClientMessage(Component.translatable("message.hailpurge.anchor.status", anchor.energy(),
+                    Component.translatable("message.hailpurge.anchor.state." + anchor.status().name().toLowerCase()),
+                    anchor.effectiveRadius(), anchor.conditionPercent(), anchor.conditionBand().name()), true);
         }
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
