@@ -15,6 +15,7 @@ public final class InitialBiosphereData extends SavedData {
     private int effectiveRadius;
     private SectorStatus status = SectorStatus.ACTIVE;
     private boolean centralAnchorInstalled;
+    private boolean initialWreckInstalled;
 
     private InitialBiosphereData(BlockPos center, int radius) {
         this.center = center;
@@ -39,6 +40,7 @@ public final class InitialBiosphereData extends SavedData {
         try { data.status = tag.contains("status") ? SectorStatus.valueOf(tag.getString("status")) : SectorStatus.ACTIVE; }
         catch (IllegalArgumentException ignored) { data.status = SectorStatus.ACTIVE; }
         data.centralAnchorInstalled = tag.getBoolean("centralAnchorInstalled");
+        data.initialWreckInstalled = tag.getBoolean("initialWreckInstalled");
         return data;
     }
 
@@ -57,6 +59,8 @@ public final class InitialBiosphereData extends SavedData {
     public SectorStatus status() { return status; }
     public boolean centralAnchorInstalled() { return centralAnchorInstalled; }
     public void installCentralAnchor() { centralAnchorInstalled = true; setDirty(); }
+    public boolean initialWreckInstalled() { return initialWreckInstalled; }
+    public void installInitialWreck() { initialWreckInstalled = true; setDirty(); }
     public void updateCentralField(int radius, SectorStatus status) {
         effectiveRadius = radius;
         this.status = status;
@@ -70,6 +74,7 @@ public final class InitialBiosphereData extends SavedData {
         tag.putInt("effectiveRadius", effectiveRadius);
         tag.putString("status", status.name());
         tag.putBoolean("centralAnchorInstalled", centralAnchorInstalled);
+        tag.putBoolean("initialWreckInstalled", initialWreckInstalled);
         return tag;
     }
 }

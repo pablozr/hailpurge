@@ -21,6 +21,8 @@ import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 
 public final class BiosphereAnchorBlockEntity extends BlockEntity {
+    private static final double CENTRAL_POWERED_WEAR_PER_SECOND = 0.00001D;
+    private static final double CENTRAL_UNPOWERED_WEAR_PER_SECOND = 0.00010D;
     private final EnergyStorage energy;
     private final LazyOptional<IEnergyStorage> capability;
     private double stability = 1.0D;
@@ -35,8 +37,15 @@ public final class BiosphereAnchorBlockEntity extends BlockEntity {
         super(BiosphereContent.ANCHOR_ENTITY.get(), pos, state);
         int capacity = state.is(BiosphereContent.CENTRAL_ANCHOR.get()) ? BiosphereConfig.CENTRAL_CAPACITY.get()
                 : BiosphereConfig.ANCHOR_CAPACITY.get();
-        energy = new EnergyStorage(capacity, Integer.MAX_VALUE, 0);
-        capability = LazyOptional.of(() -> energy);
+        energy = new EnergyStorage(capacity, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        capability = LazyOptional.of(() -> new IEnergyStorage() {
+            @Override public int receiveEnergy(int amount, boolean simulate) { return energy.receiveEnergy(amount, simulate); }
+            @Override public int extractEnergy(int amount, boolean simulate) { return 0; }
+            @Override public int getEnergyStored() { return energy.getEnergyStored(); }
+            @Override public int getMaxEnergyStored() { return energy.getMaxEnergyStored(); }
+            @Override public boolean canExtract() { return false; }
+            @Override public boolean canReceive() { return true; }
+        });
     }
     public static void tick(Level level, BlockPos pos, BlockState state, BiosphereAnchorBlockEntity anchor) {
         if (level.isClientSide() || level.getGameTime() % 20 != 0) return;
@@ -113,11 +122,11 @@ public final class BiosphereAnchorBlockEntity extends BlockEntity {
         if (energy.getEnergyStored() >= cost) {
             energy.extractEnergy(cost, false);
             stability = Math.min(1.0D, stability + 0.02D);
-            condition = Math.max(0.0D, condition - 0.0002D);
+            condition = Math.max(0.0D, condition - CENTRAL_POWERED_WEAR_PER_SECOND);
             status = stability < 1.0D ? SectorStatus.RECOVERING : SectorStatus.ACTIVE;
         } else {
             stability = Math.max((double) BiosphereConfig.CENTRAL_EMERGENCY_RADIUS.get() / BiosphereConfig.INITIAL_RADIUS.get(), stability - 0.005D);
-            condition = Math.max(0.0D, condition - 0.002D);
+            condition = Math.max(0.0D, condition - CENTRAL_UNPOWERED_WEAR_PER_SECOND);
             status = SectorStatus.DEGRADING;
         }
         InitialBiosphereData.get(level).updateCentralField(effectiveRadius(), status);

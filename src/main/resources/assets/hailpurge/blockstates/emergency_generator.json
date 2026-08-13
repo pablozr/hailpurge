@@ -1,3 +1,10 @@
 {
-  "variants": { "": { "model": "hailpurge:block/emergency_generator" } }
+  "variants": {
+    "facing=east": { "model": "hailpurge:block/emergency_generator" },
+    "facing=west": { "model": "hailpurge:block/emergency_generator", "y": 180 },
+    "facing=north": { "model": "hailpurge:block/emergency_generator", "y": 90 },
+    "facing=south": { "model": "hailpurge:block/emergency_generator", "y": 270 },
+    "facing=up": { "model": "hailpurge:block/emergency_generator", "z": 90 },
+    "facing=down": { "model": "hailpurge:block/emergency_generator", "z": 270 }
+  }
 }

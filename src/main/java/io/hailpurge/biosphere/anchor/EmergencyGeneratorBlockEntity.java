@@ -14,23 +14,27 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 public final class EmergencyGeneratorBlockEntity extends KineticBlockEntity {
     private static final int CAPACITY = 2000;
-    private static final int MAX_GENERATION_PER_TICK = 1;
-    private final EnergyStorage energy = new EnergyStorage(CAPACITY, 0, 100);
+    private static final int MAX_GENERATION_PER_TICK = 3;
+    private final EnergyStorage energy = new EnergyStorage(CAPACITY, MAX_GENERATION_PER_TICK, MAX_GENERATION_PER_TICK);
     private final LazyOptional<IEnergyStorage> capability = LazyOptional.of(() -> energy);
 
     public EmergencyGeneratorBlockEntity(BlockPos pos, BlockState state) { super(BiosphereContent.EMERGENCY_GENERATOR_ENTITY.get(), pos, state); }
-    public static void tick(Level level, BlockPos pos, BlockState state, EmergencyGeneratorBlockEntity generator) {
-        if (level.isClientSide()) return;
-        if (Math.abs(generator.getSpeed()) >= 16.0F) generator.energy.receiveEnergy(MAX_GENERATION_PER_TICK, false);
+    @Override public void tick() {
+        super.tick();
+        if (level == null || level.isClientSide()) return;
+        if (Math.abs(getSpeed()) >= 16.0F) {
+            energy.receiveEnergy(2, false);
+            if (level.getGameTime() % 2 == 0) energy.receiveEnergy(1, false);
+        }
         for (Direction side : Direction.values()) {
-            var target = level.getBlockEntity(pos.relative(side));
+            var target = level.getBlockEntity(worldPosition.relative(side));
             if (target == null) continue;
             target.getCapability(ForgeCapabilities.ENERGY, side.getOpposite()).ifPresent(storage -> {
-                int offered = generator.energy.extractEnergy(100, true);
-                generator.energy.extractEnergy(storage.receiveEnergy(offered, false), false);
+                int offered = energy.extractEnergy(100, true);
+                energy.extractEnergy(storage.receiveEnergy(offered, false), false);
             });
         }
-        generator.setChanged();
+        setChanged();
     }
     @Override public <T> LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> type, Direction side) { return type == ForgeCapabilities.ENERGY ? capability.cast() : super.getCapability(type, side); }
     @Override public void invalidateCaps() { capability.invalidate(); super.invalidateCaps(); }
