@@ -24,7 +24,9 @@ public final class BiosphereContent {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, HailPurge.MOD_ID);
     public static final RegistryObject<Block> ANCHOR = BLOCKS.register("biosphere_anchor", () -> new BiosphereAnchorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN).strength(4.0F).lightLevel(state -> 10)));
     public static final RegistryObject<Block> CENTRAL_ANCHOR = BLOCKS.register("central_anchor", () -> new BiosphereAnchorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_CYAN).strength(-1.0F, 3600000.0F).lightLevel(state -> 10)));
+    public static final RegistryObject<Block> EMERGENCY_GENERATOR = BLOCKS.register("emergency_generator", () -> new EmergencyGeneratorBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(3.0F).lightLevel(state -> 6)));
     public static final RegistryObject<Item> ANCHOR_ITEM = ITEMS.register("biosphere_anchor", () -> new BlockItem(ANCHOR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> EMERGENCY_GENERATOR_ITEM = ITEMS.register("emergency_generator", () -> new BlockItem(EMERGENCY_GENERATOR.get(), new Item.Properties()));
     public static final RegistryObject<Item> FIELD_KIT = ITEMS.register("field_maintenance_kit", () -> new Item(new Item.Properties().stacksTo(16)));
     public static final RegistryObject<Item> DAMAGED_ALTERNATOR = ITEMS.register("damaged_alternator", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> INSULATING_COMPONENT = ITEMS.register("insulating_component", () -> new Item(new Item.Properties().stacksTo(16)));
@@ -34,10 +36,12 @@ public final class BiosphereContent {
             .icon(() -> ANCHOR_ITEM.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ANCHOR_ITEM.get());
+                output.accept(EMERGENCY_GENERATOR_ITEM.get());
                 output.accept(FIELD_KIT.get());
                 output.accept(DAMAGED_ALTERNATOR.get());
                 output.accept(INSULATING_COMPONENT.get());
             }).build());
     public static final RegistryObject<BlockEntityType<BiosphereAnchorBlockEntity>> ANCHOR_ENTITY = BLOCK_ENTITIES.register("biosphere_anchor", () -> BlockEntityType.Builder.of(BiosphereAnchorBlockEntity::new, ANCHOR.get(), CENTRAL_ANCHOR.get()).build(null));
+    public static final RegistryObject<BlockEntityType<EmergencyGeneratorBlockEntity>> EMERGENCY_GENERATOR_ENTITY = BLOCK_ENTITIES.register("emergency_generator", () -> BlockEntityType.Builder.of(EmergencyGeneratorBlockEntity::new, EMERGENCY_GENERATOR.get()).build(null));
     private BiosphereContent() {}
 }

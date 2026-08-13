@@ -1,0 +1,9 @@
+{
+  "parent": "hailpurge:block/emergency_generator",
+  "display": {
+    "thirdperson_righthand": { "rotation": [20, 45, 0], "translation": [0, 2, 0], "scale": [0.48, 0.48, 0.48] },
+    "firstperson_righthand": { "rotation": [10, 45, 0], "translation": [1, 3, 1], "scale": [0.55, 0.55, 0.55] },
+    "gui": { "rotation": [25, 45, 0], "scale": [0.82, 0.82, 0.82] },
+    "ground": { "translation": [0, 2, 0], "scale": [0.46, 0.46, 0.46] }
+  }
+}

@@ -7,6 +7,7 @@
   "itemGroup.hailpurge.main": "HailPurge",
   "block.hailpurge.biosphere_anchor": "Biosphere Anchor",
   "block.hailpurge.central_anchor": "Central Biosphere Anchor",
+  "block.hailpurge.emergency_generator": "Emergency Manual Generator",
   "message.hailpurge.anchor.status": "Anchor energy: %s FE | %s | effective radius: %s | condition: %s%% (%s)",
   "message.hailpurge.anchor.state.offline": "No power; structure intact",
   "message.hailpurge.anchor.state.active": "Stable",
