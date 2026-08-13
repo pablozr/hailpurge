@@ -16,6 +16,8 @@ public final class InitialBiosphereData extends SavedData {
     private SectorStatus status = SectorStatus.ACTIVE;
     private boolean centralAnchorInstalled;
     private boolean initialWreckInstalled;
+    private boolean initialWreckModuleInstalled;
+    private BlockPos initialWreck;
 
     private InitialBiosphereData(BlockPos center, int radius) {
         this.center = center;
@@ -41,6 +43,8 @@ public final class InitialBiosphereData extends SavedData {
         catch (IllegalArgumentException ignored) { data.status = SectorStatus.ACTIVE; }
         data.centralAnchorInstalled = tag.getBoolean("centralAnchorInstalled");
         data.initialWreckInstalled = tag.getBoolean("initialWreckInstalled");
+        data.initialWreckModuleInstalled = tag.getBoolean("initialWreckModuleInstalled");
+        if (tag.contains("initialWreck")) data.initialWreck = BlockPos.of(tag.getLong("initialWreck"));
         return data;
     }
 
@@ -60,7 +64,11 @@ public final class InitialBiosphereData extends SavedData {
     public boolean centralAnchorInstalled() { return centralAnchorInstalled; }
     public void installCentralAnchor() { centralAnchorInstalled = true; setDirty(); }
     public boolean initialWreckInstalled() { return initialWreckInstalled; }
+    public BlockPos initialWreck() { return initialWreck; }
+    public void locateInitialWreck(BlockPos position) { initialWreck = position; setDirty(); }
     public void installInitialWreck() { initialWreckInstalled = true; setDirty(); }
+    public boolean initialWreckModuleInstalled() { return initialWreckModuleInstalled; }
+    public void installInitialWreckModule() { initialWreckModuleInstalled = true; setDirty(); }
     public void updateCentralField(int radius, SectorStatus status) {
         effectiveRadius = radius;
         this.status = status;
@@ -75,6 +83,8 @@ public final class InitialBiosphereData extends SavedData {
         tag.putString("status", status.name());
         tag.putBoolean("centralAnchorInstalled", centralAnchorInstalled);
         tag.putBoolean("initialWreckInstalled", initialWreckInstalled);
+        tag.putBoolean("initialWreckModuleInstalled", initialWreckModuleInstalled);
+        if (initialWreck != null) tag.putLong("initialWreck", initialWreck.asLong());
         return tag;
     }
 }

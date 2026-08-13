@@ -31,9 +31,12 @@ public final class BiosphereAnchorScreen extends AbstractContainerScreen<Biosphe
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.energy", menu.energy(), menu.capacity()), 16, 53, 0xFFE5FFFF, false);
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.condition", menu.condition(), menu.conditionBand().name()), 16, 91, 0xFFE5FFFF, false);
         graphics.drawString(font, Component.translatable("screen.hailpurge.anchor.radius", menu.radius()), 16, 120, 0xFFB8E7E1, false);
+        if (menu.central() && menu.locatorDirection() >= 0) {
+            graphics.drawString(font, Component.translatable("screen.hailpurge.central_anchor.evacuation_signal", direction(menu.locatorDirection()), menu.locatorDistance()), 16, 137, 0xFFFFC76B, false);
+        }
         Component hint = Component.translatable(menu.central() ? "screen.hailpurge.central_anchor.hint"
                 : "screen.hailpurge.anchor.hint");
-        int lineY = 137;
+        int lineY = menu.central() && menu.locatorDirection() >= 0 ? 150 : 137;
         for (var line : font.split(hint, 294)) {
             graphics.drawString(font, line, 16, lineY, 0xFF749A9B, false);
             lineY += 10;
@@ -44,5 +47,13 @@ public final class BiosphereAnchorScreen extends AbstractContainerScreen<Biosphe
         graphics.fill(x, y, x + 298, y + 8, 0xFF081114);
         int width = maximum == 0 ? 0 : Math.round(298.0F * value / maximum);
         graphics.fill(x, y, x + width, y + 8, color);
+    }
+    private static Component direction(int value) {
+        return switch (value) {
+            case 0 -> Component.translatable("screen.hailpurge.direction.east");
+            case 1 -> Component.translatable("screen.hailpurge.direction.west");
+            case 2 -> Component.translatable("screen.hailpurge.direction.south");
+            default -> Component.translatable("screen.hailpurge.direction.north");
+        };
     }
 }

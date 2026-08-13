@@ -33,5 +33,10 @@
   "screen.hailpurge.anchor.radius": "Effective radius: %s blocks",
   "screen.hailpurge.anchor.hint": "Use a Field Maintenance Kit during low load.",
   "screen.hailpurge.central_anchor.title": "Central Biosphere Anchor Terminal",
-  "screen.hailpurge.central_anchor.hint": "Central Anchor: protect this system and keep its reserve charged."
+  "screen.hailpurge.central_anchor.hint": "Central Anchor: protect this system and keep its reserve charged.",
+  "screen.hailpurge.central_anchor.evacuation_signal": "Evacuation signal: %s, approximately %s blocks",
+  "screen.hailpurge.direction.east": "east",
+  "screen.hailpurge.direction.west": "west",
+  "screen.hailpurge.direction.south": "south",
+  "screen.hailpurge.direction.north": "north"
 }
